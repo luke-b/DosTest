@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Play Wolfenstein 3D</title>
+    <script src="https://js-dos.com/6.22/js-dos.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #000;
+        }
+        #dosbox {
+            width: 80%;
+            height: 80%;
+        }
+    </style>
+</head>
+<body>
+    <div id="dosbox"></div>
+    <script>
+        Dos(document.getElementById("dosbox")).ready(function (fs, main) {
+            fs.extract("https://github.com/luke-b/DosTest/wolf3d.zip").then(function () {
+                main(["-c", "wolf3d.exe"]);
+            });
+        });
+    </script>
+</body>
+</html>
