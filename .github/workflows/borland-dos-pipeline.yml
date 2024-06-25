@@ -1,4 +1,4 @@
-name: Compile Dos Appliaction
+name: Compile 
 
 on: [push]
 
@@ -13,27 +13,39 @@ jobs:
     - name: Setup DosBox
       run: sudo apt-get install dosbox
 
-    - name: Setup Borland C++
+    - name: Download and Extract Borland C++
       run: |
         mkdir -p ${{github.workspace}}/tools
         curl -L -o ${{github.workspace}}/tools/borland.zip http://fabiensanglard.net/Compile_Like_Its_1992/tools/BCPP31.zip
         unzip ${{github.workspace}}/tools/borland.zip -d ${{github.workspace}}/tools/borland
-        echo 'mount C ${{github.workspace}}' > ${{github.workspace}}/dosbox.conf
-        echo 'C:' >> ${{github.workspace}}/dosbox.conf
-        echo 'cd C:\\tools\\borland' >> ${{github.workspace}}/dosbox.conf
-        echo 'install' >> ${{github.workspace}}/dosbox.conf
+
+    - name: Prepare Borland C++ Setup Script
+      run: |
+        echo 'mount C ${{github.workspace}}' > ${{github.workspace}}/dosbox_install.conf
+        echo 'C:' >> ${{github.workspace}}/dosbox_install.conf
+        echo 'cd tools/borland' >> ${{github.workspace}}/dosbox_install.conf
+        echo 'install.exe' >> ${{github.workspace}}/dosbox_install.conf
+
+    - name: Install Borland C++
+      run: dosbox -conf ${{github.workspace}}/dosbox_install.conf
+
+    - name: Prepare Build Script
+      run: |
+        echo 'mount C ${{github.workspace}}' > ${{github.workspace}}/dosbox_build.conf
+        echo 'C:' >> ${{github.workspace}}/dosbox_build.conf
+        echo 'cd WOLF3D/SRC' >> ${{github.workspace}}/dosbox_build.conf
+        echo 'bcc +WOLF3D.CFG' >> ${{github.workspace}}/dosbox_build.conf
 
     - name: Compile Wolfenstein 3D
-      run: |
-        echo 'cd C:\\WOLF3D\\SRC' >> ${{github.workspace}}/dosbox.conf
-        echo 'bcc +WOLF3D.CFG' >> ${{github.workspace}}/dosbox.conf
-        dosbox -conf ${{github.workspace}}/dosbox.conf
+      run: dosbox -conf ${{github.workspace}}/dosbox_build.conf
 
     - name: Collect artifacts
       run: |
-        cp ${{github.workspace}}/WOLF3D/*.EXE ${{github.workspace}}/artifacts/
-        cp ${{github.workspace}}/WOLF3D/*.MAP ${{github.workspace}}/artifacts/
+        mkdir -p ${{github.workspace}}/artifacts
+        cp ${{github.workspace}}/WOLF3D/SRC/*.EXE ${{github.workspace}}/artifacts/
+        cp ${{github.workspace}}/WOLF3D/SRC/*.MAP ${{github.workspace}}/artifacts/
       uses: actions/upload-artifact@v2
       with:
         name: compiled-game
         path: ${{github.workspace}}/artifacts/
+
