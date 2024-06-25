@@ -1,0 +1,39 @@
+name: Compile Dos Appliaction
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Setup DosBox
+      run: sudo apt-get install dosbox
+
+    - name: Setup Borland C++
+      run: |
+        mkdir -p ${{github.workspace}}/tools
+        curl -L -o ${{github.workspace}}/tools/borland.zip http://fabiensanglard.net/Compile_Like_Its_1992/tools/BCPP31.zip
+        unzip ${{github.workspace}}/tools/borland.zip -d ${{github.workspace}}/tools/borland
+        echo 'mount C ${{github.workspace}}' > ${{github.workspace}}/dosbox.conf
+        echo 'C:' >> ${{github.workspace}}/dosbox.conf
+        echo 'cd C:\\tools\\borland' >> ${{github.workspace}}/dosbox.conf
+        echo 'install' >> ${{github.workspace}}/dosbox.conf
+
+    - name: Compile Wolfenstein 3D
+      run: |
+        echo 'cd C:\\WOLF3D\\SRC' >> ${{github.workspace}}/dosbox.conf
+        echo 'bcc +WOLF3D.CFG' >> ${{github.workspace}}/dosbox.conf
+        dosbox -conf ${{github.workspace}}/dosbox.conf
+
+    - name: Collect artifacts
+      run: |
+        cp ${{github.workspace}}/WOLF3D/*.EXE ${{github.workspace}}/artifacts/
+        cp ${{github.workspace}}/WOLF3D/*.MAP ${{github.workspace}}/artifacts/
+      uses: actions/upload-artifact@v2
+      with:
+        name: compiled-game
+        path: ${{github.workspace}}/artifacts/
