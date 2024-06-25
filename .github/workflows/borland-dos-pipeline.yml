@@ -1,4 +1,4 @@
-name: Compile 
+name: Compile Wolfenstein 3D
 
 on: [push]
 
@@ -39,13 +39,10 @@ jobs:
     - name: Compile Wolfenstein 3D
       run: dosbox -conf ${{github.workspace}}/dosbox_build.conf
 
-    - name: Collect artifacts
-      run: |
-        mkdir -p ${{github.workspace}}/artifacts
-        cp ${{github.workspace}}/WOLF3D/SRC/*.EXE ${{github.workspace}}/artifacts/
-        cp ${{github.workspace}}/WOLF3D/SRC/*.MAP ${{github.workspace}}/artifacts/
+    - name: Upload artifacts
       uses: actions/upload-artifact@v2
       with:
         name: compiled-game
-        path: ${{github.workspace}}/artifacts/
-
+        path: |
+          ${{github.workspace}}/WOLF3D/SRC/*.EXE
+          ${{github.workspace}}/WOLF3D/SRC/*.MAP
