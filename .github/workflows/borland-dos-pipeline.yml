@@ -27,7 +27,7 @@ jobs:
         echo 'install.exe' >> ${{github.workspace}}/dosbox_install.conf
 
     - name: Install Borland C++
-      run: dosbox -conf ${{github.workspace}}/dosbox_install.conf
+      run: dosbox -noconsole -conf ${{github.workspace}}/dosbox_install.conf
 
     - name: Prepare Build Script
       run: |
