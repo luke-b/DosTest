@@ -13,35 +13,13 @@ jobs:
     - name: Setup DosBox
       run: sudo apt-get install dosbox
 
-    - name: Download and Extract Borland C++
-      run: |
-        mkdir -p ${{github.workspace}}/tools
-        curl -L -o ${{github.workspace}}/tools/borland.zip http://fabiensanglard.net/Compile_Like_Its_1992/tools/BCPP31.zip
-        unzip ${{github.workspace}}/tools/borland.zip -d ${{github.workspace}}/tools/borland
-
-    - name: Prepare Borland C++ Setup Script
-      run: |
-        echo 'mount c ${{github.workspace}}' > ${{github.workspace}}/dosbox_install.conf
-        echo 'c:' >> ${{github.workspace}}/dosbox_install.conf
-        echo 'cd tools/borland' >> ${{github.workspace}}/dosbox_install.conf
-        echo 'install.exe' >> ${{github.workspace}}/dosbox_install.conf
-        echo '[log]' >> ${{github.workspace}}/dosbox.conf
-        echo 'logfile=install_log.txt' >> ${{github.workspace}}/dosbox.conf
-
-    - name: Automate Borland C++ Installation
-      run: |
-        export TERM=dumb
-        (echo "ENTER"; echo "ENTER"; echo "C"; echo "\BCSETUP"; echo "ENTER"; echo "ENTER"; echo "ENTER"; echo "N") | dosbox -noconsole -conf ${{github.workspace}}/dosbox_install.conf
-        cat install_log.txt
-
     - name: Prepare Build Script
       run: |
         echo 'mount c ${{github.workspace}}' > ${{github.workspace}}/dosbox_build.conf
         echo 'c:' >> ${{github.workspace}}/dosbox_build.conf
-        echo 'cd WOLF3D/SRC' >> ${{github.workspace}}/dosbox_build.conf
-        echo 'bcc +WOLF3D.CFG' >> ${{github.workspace}}/dosbox_build.conf
-        echo '[log]' >> ${{github.workspace}}/dosbox_build.conf
-        echo 'logfile=build_log.txt' >> ${{github.workspace}}/dosbox_build.conf
+        echo 'cd WOLFSRC' >> ${{github.workspace}}/dosbox_build.conf
+        echo 'bcc @wolf3d.prj' >> ${{github.workspace}}/dosbox_build.conf
+        echo 'exit' >> ${{github.workspace}}/dosbox_build.conf
 
     - name: Compile Wolfenstein 3D
       run: |
@@ -49,10 +27,13 @@ jobs:
         dosbox -noconsole -conf ${{github.workspace}}/dosbox_build.conf
         cat build_log.txt
 
+    - name: Zip the Output
+      run: |
+        zip -r wolf3d.zip WOLF3D
+
     - name: Upload artifacts
       uses: actions/upload-artifact@v2
       with:
         name: compiled-game
         path: |
-          ${{github.workspace}}/WOLF3D/SRC/*.EXE
-          ${{github.workspace}}/WOLF3D/SRC/*.MAP
+          wolf3d.zip
