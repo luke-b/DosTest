@@ -4,21 +4,24 @@ on: [push, pull_request]
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Install dosbox-x (apt)
       run: sudo apt-get install -y dosbox
 
     - name: Prepare Assets
       run: |
-        # Create build directory
-        mkdir build
-        # Generate assets batch file
+        mkdir -p build
         echo 'echo Preparing assets...' > build/assets.bat
+
+    - name: Ensure Borland C++ Config
+      run: |
+        mkdir -p programs/borlandc
+        echo '{}' > programs/borlandc/config.json
 
     - name: Compile
       uses: joncloud/dos-build-action@main
@@ -46,8 +49,6 @@ jobs:
       run: |
         echo "Build Log"
         cat build/build_log.txt
-
-        rm build/build_log.txt
 
     - name: Zip the build output
       run: |
