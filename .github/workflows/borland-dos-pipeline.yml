@@ -20,15 +20,11 @@ jobs:
         export TERM=dumb
         dosbox-x -silent -debug -conf dosbox.conf -c "mount c . && c: && call autoexec.bat" -log-con 
 
-    - name: Zip the build output
-      run: |
-        zip -r wolf3d.zip WOLF3D
-
     - name: Upload build artifacts
       uses: actions/upload-artifact@v3
       with:
         name: build-dos
-        path: wolf3d.zip
+        path: WOLF3D
 
     - name: Upload console log
       uses: actions/upload-artifact@v3
