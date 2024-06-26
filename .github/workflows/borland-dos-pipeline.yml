@@ -1,39 +1,42 @@
-name: Compile Wolfenstein 3D
+name: Build Wolfenstein 3D
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
-    - name: Checkout code
+    - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Setup DosBox
-      run: sudo apt-get install dosbox
+    - name: Install dosbox-x (apt)
+      run: sudo apt-get install -y dosbox
 
-    - name: Prepare Build Script
+    - name: Prepare DosBox build configuration
       run: |
-        echo 'mount c ${{github.workspace}}' > ${{github.workspace}}/dosbox_build.conf
-        echo 'c:' >> ${{github.workspace}}/dosbox_build.conf
-        echo 'cd WOLFSRC' >> ${{github.workspace}}/dosbox_build.conf
-        echo 'bcc @wolf3d.prj' >> ${{github.workspace}}/dosbox_build.conf
-        echo 'exit' >> ${{github.workspace}}/dosbox_build.conf
+        echo '[autoexec]' > dosbox_build.conf
+        echo 'mount c ${{ github.workspace }}' >> dosbox_build.conf
+        echo 'c:' >> dosbox_build.conf
+        echo 'cd WOLFSRC' >> dosbox_build.conf
+        echo 'bcc @wolf3d.prj' >> dosbox_build.conf
+        echo 'exit' >> dosbox_build.conf
 
-    - name: Compile Wolfenstein 3D
+    - name: Compile with DosBox
+      run: dosbox -noconsole -conf dosbox_build.conf
+
+    - name: Prepare Results
+      if: always()
       run: |
-        export TERM=dumb
-        dosbox -noconsole -conf ${{github.workspace}}/dosbox_build.conf
-        cat build_log.txt
+        echo "Build Log"
+        cat build/*.txt
+        rm build/*.txt
 
-    - name: Zip the Output
+    - name: Zip the build output
       run: |
         zip -r wolf3d.zip WOLF3D
 
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v3
       with:
-        name: compiled-game
-        path: |
-          wolf3d.zip
+        name: build-dos
+        path: wolf3d.zip
