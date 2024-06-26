@@ -1,0 +1,27 @@
+<div id="dosbox" style="width: 640px; height: 400px;">
+   <div class="dosbox-container">
+      <canvas class="dosbox-canvas" oncontextmenu="event.preventDefault()"></canvas>
+      <div class="dosbox-loader">
+         <div class="st-loader"><span class="equal"></span></div>
+         <div class="dosbox-loader-message"></div>
+      </div>
+      <div class="dosbox-overlay">
+         <div class="dosbox-powered">Powered by &nbsp;<a href="http://js-dos.com">js-dos.com</a></div>
+         <div class="dosbox-start">Click to start</div>
+      </div>
+   </div>
+</div>
+<br>
+<button onclick="dosbox.requestFullScreen();">Make fullscreen</button>
+<script type="text/javascript" src="https://js-dos.com/v8/build/wdosbox.js"></script>
+<script type="text/javascript">
+   var dosbox = new Dosbox({
+        id: "dosbox",
+        onload: function (dosbox) {
+        dosbox.run("https://github.com/luke-b/DosTest/actions/runs/9683912806/artifacts/1641429331", "./WOLF3D.EXE");
+        },
+        onrun: function (dosbox, app) {
+        console.log("App '" + app + "' is runned");
+        }
+        });
+</script>
