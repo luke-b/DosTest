@@ -13,30 +13,48 @@ jobs:
     - name: Install dosbox-x (apt)
       run: sudo apt-get install -y dosbox
 
-    - name: Prepare DosBox build configuration
+    - name: Prepare Assets
       run: |
-        echo '[autoexec]' > dosbox_build.conf
-        echo 'mount c ${{ github.workspace }}' >> dosbox_build.conf
-        echo 'c:' >> dosbox_build.conf
-        echo 'cd WOLFSRC' >> dosbox_build.conf
-        echo 'bcc @wolf3d.prj' >> dosbox_build.conf
-        echo 'exit' >> dosbox_build.conf
+        # Create build directory
+        mkdir build
+        # Generate assets batch file
+        echo 'echo Preparing assets...' > build/assets.bat
 
-    - name: Compile with DosBox
-      run: dosbox -noconsole -conf dosbox_build.conf
+    - name: Compile
+      uses: joncloud/dos-build-action@main
+      timeout-minutes: 2
+      with:
+        programs: |
+          $/borlandc:c:\borlandc
+          WOLFSRC:c:\WOLFSRC
+          WOLF3D:c:\WOLF3D
+        run: |
+          c:
+          cd \WOLFSRC
+          bcc @wolf3d.prj > c:\build\build_log.txt
+          c:\build\assets.bat
+        conf: |
+          [dosbox]
+          memsize=256
+
+          [cpu]
+          cycles=max
+          turbo=true
 
     - name: Prepare Results
       if: always()
       run: |
         echo "Build Log"
-        cat build/*.txt
-        rm build/*.txt
+        cat build/build_log.txt
+
+        rm build/build_log.txt
 
     - name: Zip the build output
       run: |
         zip -r wolf3d.zip WOLF3D
 
-    - uses: actions/upload-artifact@v3
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
       with:
         name: build-dos
         path: wolf3d.zip
