@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Play Wolfenstein 3D</title>
+    <link rel="stylesheet" href="https://js-dos.com/v8/js-dos.css">
+    <script src="https://js-dos.com/v8/js-dos.js"></script>
+</head>
+<body>
+    <h1>Wolfenstein 3D</h1>
+    <div id="dos" style="width: 100vw; height: 60vw;"></div>
+    <script>
+        async function fetchLatestArtifactUrl() {
+            const owner = "luke-b";
+            const repo = "DosTest";
+            const workflow_id = "9683912806";
+            const artifactName = "build-dos";
+
+            // Fetch the latest successful workflow run
+            let response = await fetch(`https://api.github.com/repos/${owner}/${repo}/actions/workflows/${workflow_id}/runs?status=success&per_page=1`);
+            let data = await response.json();
+            if (data.total_count === 0) {
+                throw new Error("No successful workflow runs found.");
+            }
+
+            const latestRun = data.workflow_runs[0];
+
+            // Fetch the artifacts for the latest successful run
+            response = await fetch(latestRun.artifacts_url);
+            data = await response.json();
+
+            const artifact = data.artifacts.find(a => a.name === artifactName);
+            if (!artifact) {
+                throw new Error(`Artifact ${artifactName} not found.`);
+            }
+
+            // Return the download URL for the artifact
+            return artifact.archive_download_url;
+        }
+
+        async function initDosBox() {
+            try {
+                const artifactUrl = await fetchLatestArtifactUrl();
+                Dos(document.getElementById("dos"), {
+                    wdosboxUrl: 'https://js-dos.com/v8/build/wdosbox.js',
+                    cycles: 10000,
+                    autolock: true,
+                    zip: artifactUrl,
+                    onprogress: (stage, total, loaded) => {
+                        if (stage === 'unzipping') {
+                            console.log(`Unzipping: ${(loaded / total * 100).toFixed(2)}%`);
+                        }
+                    }
+                }).then(dosbox => {
+                    dosbox.run('wolf3d.exe');
+                });
+            } catch (error) {
+                console.error('Error initializing DOSBox:', error);
+            }
+        }
+
+        initDosBox();
+    </script>
+</body>
+</html>
