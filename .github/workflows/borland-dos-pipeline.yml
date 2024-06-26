@@ -18,7 +18,7 @@ jobs:
     - name: Run DosBox to build Wolf3D
       run: |
         export TERM=dumb
-        dosbox-x -early-debug -silent -conf dosbox.conf -c "mount c . && c: && call autoexec.bat"
+        dosbox-x -conf dosbox.conf -c "mount c . && c: && call autoexec.bat" -exit > dosbox_console_log.txt 2>&1
 
     - name: Zip the build output
       run: |
@@ -29,3 +29,9 @@ jobs:
       with:
         name: build-dos
         path: wolf3d.zip
+
+    - name: Upload console log
+      uses: actions/upload-artifact@v3
+      with:
+        name: dosbox-console-log
+        path: dosbox_console_log.txt
