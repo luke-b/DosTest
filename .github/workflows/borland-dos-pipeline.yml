@@ -21,7 +21,7 @@ jobs:
     - name: Ensure Borland C++ Config
       run: |
         mkdir -p programs/borlandc
-        echo '{}' > programs/borlandc/config.json
+        echo '{ "PATH": "c:\\borlandc\\bin;c:\\tc\\bin" }' > programs/borlandc/config.json
 
     - name: Compile
       uses: joncloud/dos-build-action@main
