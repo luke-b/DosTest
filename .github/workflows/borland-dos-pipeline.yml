@@ -18,7 +18,7 @@ jobs:
     - name: Run DosBox to build Wolf3D
       run: |
         export TERM=dumb
-        dosbox-x -conf dosbox.conf -c "mount c . && c: && call autoexec.bat" -exit > dosbox_console_log.txt 2>&1
+        dosbox-x -silent -debug -conf dosbox.conf -c "mount c . && c: && call autoexec.bat" -log-con
 
     - name: Zip the build output
       run: |
