@@ -11,12 +11,14 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Install dosbox
-      run: sudo apt-get install -y dosbox
+      run: |
+        sudo apt-get install snapd
+        sudo snap install dosbox-x
 
     - name: Run DosBox to build Wolf3D
       run: |
         export TERM=dumb
-        dosbox -conf dosbox.conf -c "c:\\autoexec.bat"
+        dosbox-x -conf dosbox.conf -c "mount c . && c: && call autoexec.bat" -exit
 
     - name: Zip the build output
       run: |
