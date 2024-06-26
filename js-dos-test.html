@@ -9,7 +9,7 @@
 </head>
 <body>
     <h1>Wolfenstein 3D</h1>
-    <div id="dos" style="width: 800px; height: 600px;"></div>
+    <div id="Dos" style="width: 800px; height: 600px;"></div>
     <script>
         async function fetchLatestArtifactUrl() {
             const owner = "luke-b";
@@ -43,7 +43,7 @@
             try {
                 //const artifactUrl = await fetchLatestArtifactUrl();
                 const artifactUrl = "https://github.com/luke-b/DosTest/actions/runs/9683912806/artifacts/1641429331";
-                Dos(document.getElementById("dos"), {
+                Dos(document.getElementById("Dos"), {
                     wdosboxUrl: 'https://js-dos.com/v8/build/wdosbox.js',
                     cycles: 10000,
                     autolock: true,
