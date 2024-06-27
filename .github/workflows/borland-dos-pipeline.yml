@@ -43,8 +43,7 @@ jobs:
 
       - name: Zip the build output
         run: |
-          cd artifact
-          zip -r ../wolf3d.zip .
+          zip -r ./wolf3d.zip .
         
 
       - name: Base64 encode the build output
