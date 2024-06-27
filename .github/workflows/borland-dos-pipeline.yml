@@ -28,6 +28,7 @@ jobs:
         with:
           name: dosbox-console-log
           path: dosbox_console_log.txt
+          
   generate-html:
     runs-on: ubuntu-latest
     needs: build
@@ -36,42 +37,45 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: build-dos
-          path: ./artifact
 
       - name: List files in artifact directory
         run: ls -R ./artifact
-          
+
+      - name: Zip the build output
+        run: |
+          cd artifact
+          zip -r ../wolf3d.zip .
+        
+
       - name: Base64 encode the build output
         run: |
-          base64 ./artifact/wolf3d.zip > wolf3d_base64.txt
-      - name: Generate HTML file
-        run: >
-          echo "<!DOCTYPE html>
+          base64 ./wolf3d.zip > wolf3d_base64.txt
 
-          <html>
+      - name: Create HTML file
+        run: |
+          echo '<!DOCTYPE html>' > wolf3d.html
+          echo '<html>' >> wolf3d.html
+          echo '<head>' >> wolf3d.html
+          echo '<script src="https://js-dos.com/6.22/current/js-dos.js"></script>' >> wolf3d.html
+          echo '</head>' >> wolf3d.html
+          echo '<body>' >> wolf3d.html
+          echo '<h1>Wolfenstein 3D</h1>' >> wolf3d.html
+          echo '<div id="jsdos" style="width: 640px; height: 400px;"></div>' >> wolf3d.html
+          echo '<script>' >> wolf3d.html
+          echo 'async function initDosBox() {' >> wolf3d.html
+          echo '  const dos = await Dos(ctx, { wdosboxUrl: "https://js-dos.com/6.22/current/wdosbox.js" });' >> wolf3d.html
+          echo '  const zipFile = `' >> wolf3d.html
+          cat wolf3d_base64.txt >> wolf3d.html
+          echo '`;' >> wolf3d.html
+          echo '  const zipBlob = await fetch("data:application/zip;base64," + zipFile).then(r => r.blob());' >> wolf3d.html
+          echo '  await dos.fs.extract(zipBlob);' >> wolf3d.html
+          echo '  dos.run("WOLF3D.EXE");' >> wolf3d.html
+          echo '}' >> wolf3d.html
+          echo 'initDosBox();' >> wolf3d.html
+          echo '</script>' >> wolf3d.html
+          echo '</body>' >> wolf3d.html
+          echo '</html>' >> wolf3d.html
 
-          <head>
-              <title>Wolfenstein 3D</title>
-              <script src='https://js-dos.com/6.22/js-dos.js'></script>
-          </head>
-
-          <body>
-              <h1>Wolfenstein 3D</h1>
-              <div id='jsdos'></div>
-              <script>
-                  async function initDosBox() {
-                      const response = await fetch('data:application/zip;base64,$(cat wolf3d_base64.txt)');
-                      const blob = await response.blob();
-                      const dosbox = await Dos(document.getElementById('jsdos')).run(blob);
-                      dosbox.onrun = (ci) => {
-                          ci.simulateKeyPress(13); // Press Enter to skip intro
-                      };
-                  }
-                  initDosBox();
-              </script>
-          </body>
-
-          </html>" > wolf3d.html
       - name: Upload HTML file
         uses: actions/upload-artifact@v3
         with:
