@@ -39,7 +39,7 @@ jobs:
           name: build-dos
 
       - name: List files in artifact directory
-        run: ls -R ./artifact
+        run: ls -R .
 
       - name: Zip the build output
         run: |
