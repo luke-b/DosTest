@@ -37,6 +37,10 @@ jobs:
         with:
           name: build-dos
           path: ./artifact
+
+      - name: List files in artifact directory
+        run: ls -R ./artifact
+          
       - name: Base64 encode the build output
         run: |
           base64 ./artifact/wolf3d.zip > wolf3d_base64.txt
