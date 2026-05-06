@@ -9,7 +9,9 @@
 
 #include "WL_MENU.H"
 
-#ifdef SPANISH
+#ifdef CZECH
+#include "CZECH.H"
+#elif defined(SPANISH)
 #include "SPANISH.H"
 #else
 #include "FOREIGN.H"

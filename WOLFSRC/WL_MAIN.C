@@ -776,6 +776,8 @@ void FinishSignon (void)
 
 	#ifdef SPANISH
 	US_CPrint ("Oprima una tecla");
+	#elif defined(CZECH)
+	US_CPrint ("Stisknete klavesu");
 	#else
 	US_CPrint ("Press a key");
 	#endif
@@ -793,6 +795,8 @@ void FinishSignon (void)
 
 	#ifdef SPANISH
 	US_CPrint ("pensando...");
+	#elif defined(CZECH)
+	US_CPrint ("Pracuji...");
 	#else
 	US_CPrint ("Working...");
 	#endif

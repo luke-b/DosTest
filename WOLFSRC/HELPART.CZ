@@ -1,0 +1,22 @@
+^P
+^C1F
+Ovladani hry
+^C17
+
+Pohyb:
+  Sipky - pohyb a otaceni
+  Alt + Sipky - strafe (bocni pohyb)
+  Shift - behat
+
+Akce:
+  Ctrl - strelba
+  Mezera/Enter - otevrit dvere
+
+Ostatni:
+  Esc - menu
+  F1 - Napoveda
+  F2 - Ulozit hru
+  F3 - Nacist hru
+  F10 - Ukoncit hru
+  Tab+P (s "goobers") - snimek obrazovky
+^E

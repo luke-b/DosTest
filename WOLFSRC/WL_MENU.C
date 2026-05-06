@@ -87,6 +87,8 @@ MainMenu[]=
 
 	#ifdef SPANISH
 	{2,"Ve esto!",CP_ReadThis},
+	#elif defined(CZECH)
+	{2,"Prectete si to!",CP_ReadThis},
 	#else
 	{2,"Read This!",CP_ReadThis},
 	#endif
@@ -202,6 +204,24 @@ far NewEmenu[]=
 	{0,"",0},
 	{3,"Episodio 6\n"
 		  "Confrontacion",0}
+	#elif defined(CZECH)
+	{1,"Epizoda 1\n"
+	   "Unik z Wolfensteinu",0},
+	{0,"",0},
+	{3,"Epizoda 2\n"
+		   "Operace Eisenfaust",0},
+	{0,"",0},
+	{3,"Epizoda 3\n"
+		   "Zemri, Fuhrere, Zemri!",0},
+	{0,"",0},
+	{3,"Epizoda 4\n"
+		  "Temne tajemstvi",0},
+	{0,"",0},
+	{3,"Epizoda 5\n"
+		  "Stopa blazna",0},
+	{0,"",0},
+	{3,"Epizoda 6\n"
+		  "Konfrontace",0}
 	#else
 	{1,"Episode 1\n"
 	   "Escape from Wolfenstein",0},
@@ -549,6 +569,8 @@ void DrawMainMenu(void)
 
 	#ifdef SPANISH
 	DrawWindow(MENU_X-8,MENU_Y-3,MENU_W+8,MENU_H,BKGDCOLOR);
+	#elif defined(CZECH)
+	DrawWindow(MENU_X-8,MENU_Y-3,MENU_W+8,MENU_H,BKGDCOLOR);
 	#else
 	DrawWindow(MENU_X-8,MENU_Y-3,MENU_W,MENU_H,BKGDCOLOR);
 	#endif
@@ -562,6 +584,8 @@ void DrawMainMenu(void)
 		#ifndef JAPAN
 
 		#ifdef SPANISH
+		_fstrcpy(&MainMenu[backtodemo].string,STR_GAME);
+		#elif defined(CZECH)
 		_fstrcpy(&MainMenu[backtodemo].string,STR_GAME);
 		#else
 		_fstrcpy(&MainMenu[backtodemo].string[8],STR_GAME);
@@ -581,6 +605,8 @@ void DrawMainMenu(void)
 	{
 		#ifndef JAPAN
 		#ifdef SPANISH
+		_fstrcpy(&MainMenu[backtodemo].string,STR_BD);
+		#elif defined(CZECH)
 		_fstrcpy(&MainMenu[backtodemo].string,STR_BD);
 		#else
 		_fstrcpy(&MainMenu[backtodemo].string[8],STR_DEMO);
@@ -825,6 +851,8 @@ int CP_CheckQuick(unsigned scancode)
 			#else
 				#ifdef SPANISH
 			if (Confirm(ENDGAMESTR))
+				#elif defined(CZECH)
+			if (Confirm(ENDGAMESTR))
 				#else
 			if (Confirm(endStrings[US_RndT()&0x7+(US_RndT()&1)]))
 				#endif
@@ -1063,6 +1091,8 @@ void DrawNewEpisode(void)
 	WindowX=0;
 	#ifdef SPANISH
 	US_CPrint("Cual episodio jugar?");
+	#elif defined(CZECH)
+	US_CPrint("Kterou epizodu hrat?");
 	#else
 	US_CPrint("Which episode to play?");
 	#endif
@@ -1099,6 +1129,8 @@ void DrawNewGame(void)
 #ifndef SPEAR
 	#ifdef SPANISH
 	US_Print("Eres macho?");
+	#elif defined(CZECH)
+	US_Print("Jak jsi statecny?");
 	#else
 	US_Print("How tough are you?");
 	#endif
@@ -1841,6 +1873,8 @@ void DrawMouseSens(void)
 	VWB_DrawPic(112,184,C_MOUSELBACKPIC);
 	#ifdef SPANISH
 	DrawWindow(10,80,300,43,BKGDCOLOR);
+	#elif defined(CZECH)
+	DrawWindow(10,80,300,43,BKGDCOLOR);
 	#else
 	DrawWindow(10,80,300,30,BKGDCOLOR);
 	#endif
@@ -1853,6 +1887,12 @@ void DrawMouseSens(void)
 
 	SETFONTCOLOR(TEXTCOLOR,BKGDCOLOR);
 	#ifdef SPANISH
+	PrintX=14;
+	PrintY=95+13;
+	US_Print(STR_SLOW);
+	PrintX=252;
+	US_Print(STR_FAST);
+	#elif defined(CZECH)
 	PrintX=14;
 	PrintY=95+13;
 	US_Print(STR_SLOW);
@@ -2479,6 +2519,15 @@ void DrawCustomScreen(void)
 	US_Print(STR_CFIRE);
 	PrintX=CST_START-16+CST_SPC*3;
 	US_Print(STR_CSTRAFE"\n");
+	#elif defined(CZECH)
+	PrintX=CST_START-16;
+	US_Print(STR_CRUN);
+	PrintX=CST_START-16+CST_SPC*1;
+	US_Print(STR_COPEN);
+	PrintX=CST_START-16+CST_SPC*2;
+	US_Print(STR_CFIRE);
+	PrintX=CST_START-16+CST_SPC*3;
+	US_Print(STR_CSTRAFE"\n");
 	#else
 	PrintX=CST_START;
 	US_Print(STR_CRUN);
@@ -2512,6 +2561,15 @@ void DrawCustomScreen(void)
 
 	SETFONTCOLOR(TEXTCOLOR,BKGDCOLOR);
 	#ifdef SPANISH
+	PrintX=CST_START-16;
+	US_Print(STR_CRUN);
+	PrintX=CST_START-16+CST_SPC*1;
+	US_Print(STR_COPEN);
+	PrintX=CST_START-16+CST_SPC*2;
+	US_Print(STR_CFIRE);
+	PrintX=CST_START-16+CST_SPC*3;
+	US_Print(STR_CSTRAFE"\n");
+	#elif defined(CZECH)
 	PrintX=CST_START-16;
 	US_Print(STR_CRUN);
 	PrintX=CST_START-16+CST_SPC*1;
@@ -2554,6 +2612,15 @@ void DrawCustomScreen(void)
 	US_Print(STR_CFIRE);
 	PrintX=CST_START-16+CST_SPC*3;
 	US_Print(STR_CSTRAFE"\n");
+	#elif defined(CZECH)
+	PrintX=CST_START-16;
+	US_Print(STR_CRUN);
+	PrintX=CST_START-16+CST_SPC*1;
+	US_Print(STR_COPEN);
+	PrintX=CST_START-16+CST_SPC*2;
+	US_Print(STR_CFIRE);
+	PrintX=CST_START-16+CST_SPC*3;
+	US_Print(STR_CSTRAFE"\n");
 	#else
 	PrintX=CST_START;
 	US_Print(STR_CRUN);
@@ -2574,6 +2641,15 @@ void DrawCustomScreen(void)
 	//
 	SETFONTCOLOR(TEXTCOLOR,BKGDCOLOR);
 	#ifdef SPANISH
+	PrintX=4;
+	US_Print(STR_LEFT);
+	US_Print("/");
+	US_Print(STR_RIGHT);
+	US_Print("/");
+	US_Print(STR_FRWD);
+	US_Print("/");
+	US_Print(STR_BKWD"\n");
+	#elif defined(CZECH)
 	PrintX=4;
 	US_Print(STR_LEFT);
 	US_Print("/");
@@ -2851,6 +2927,8 @@ void CP_Quit(void)
 	#else
 
 	#ifdef SPANISH
+	if (Confirm(ENDGAMESTR))
+	#elif defined(CZECH)
 	if (Confirm(ENDGAMESTR))
 	#else
 	if (Confirm(endStrings[US_RndT()&0x7+(US_RndT()&1)]))
@@ -3630,6 +3708,8 @@ int Confirm(char far *string)
 
 	#ifdef SPANISH
 	} while(!Keyboard[sc_S] && !Keyboard[sc_N] && !Keyboard[sc_Escape]);
+	#elif defined(CZECH)
+	} while(!Keyboard[sc_A] && !Keyboard[sc_N] && !Keyboard[sc_Escape]);
 	#else
 	} while(!Keyboard[sc_Y] && !Keyboard[sc_N] && !Keyboard[sc_Escape]);
 	#endif
@@ -3642,6 +3722,15 @@ int Confirm(char far *string)
 	}
 
 	while(Keyboard[sc_S] || Keyboard[sc_N] || Keyboard[sc_Escape]);
+
+	#elif defined(CZECH)
+	if (Keyboard[sc_A])
+	{
+		xit=1;
+		ShootSnd();
+	}
+
+	while(Keyboard[sc_A] || Keyboard[sc_N] || Keyboard[sc_Escape]);
 
 	#else
 
@@ -3685,6 +3774,8 @@ int GetYorN(int x,int y,int pic)
 
 	#ifdef SPANISH
 	} while(!Keyboard[sc_S] && !Keyboard[sc_N] && !Keyboard[sc_Escape]);
+	#elif defined(CZECH)
+	} while(!Keyboard[sc_A] && !Keyboard[sc_N] && !Keyboard[sc_Escape]);
 	#else
 	} while(!Keyboard[sc_Y] && !Keyboard[sc_N] && !Keyboard[sc_Escape]);
 	#endif
@@ -3697,6 +3788,15 @@ int GetYorN(int x,int y,int pic)
 	}
 
 	while(Keyboard[sc_S] || Keyboard[sc_N] || Keyboard[sc_Escape]);
+
+	#elif defined(CZECH)
+	if (Keyboard[sc_A])
+	{
+		xit=1;
+		ShootSnd();
+	}
+
+	while(Keyboard[sc_A] || Keyboard[sc_N] || Keyboard[sc_Escape]);
 
 	#else
 
