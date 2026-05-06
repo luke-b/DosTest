@@ -1,6 +1,7 @@
 # Wolfenstein 3D Build with DOSBox-X and Borland C++ on GitHub Actions
 
 <!-- DEMO_LINK -->
+[![Play latest build](https://img.shields.io/badge/Play-Latest%20Build-brightgreen)](https://luke-b.github.io/DosTest/demo/build/81daf9b/)
 <!-- /DEMO_LINK -->
 
 This repository contains a setup to build the classic Wolfenstein 3D shareware source code using DOSBox-X and Borland C++ within a GitHub Actions pipeline. The built executable can then be run using js-dos, making it accessible through a web browser.
