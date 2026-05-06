@@ -9,14 +9,15 @@ permissions:
   pages: write
   id-token: write
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        env:
-          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
       - name: Install dosbox-x and xvfb
         run: |
           sudo apt-get install -y xvfb
@@ -104,8 +105,8 @@ jobs:
         run: |
           echo "Files in WOLF3D/:"
           ls -la WOLF3D/
-          if [ ! -f WOLF3D/wolf3d.exe ]; then
-            echo "ERROR: wolf3d.exe not found in build artifact" >&2
+          if [ ! -f WOLF3D/WOLF3D.EXE ]; then
+            echo "ERROR: WOLF3D.EXE not found in build artifact" >&2
             exit 1
           fi
 
@@ -118,7 +119,7 @@ jobs:
           [autoexec]
           mount c .
           c:
-          wolf3d.exe
+          WOLF3D.EXE
           EOF
 
       - name: Package hra.jsdos
