@@ -176,6 +176,10 @@ void Victory (void)
 	Write(RATIOX+2,  RATIOY,      STR_RATKILL);
 	Write(RATIOX+2,  RATIOY+2,  STR_RATSECRET);
 	Write(RATIOX+2,  RATIOY+4,STR_RATTREASURE);
+	#elif defined(CZECH)
+	Write(RATIOX+2,  RATIOY,      STR_RATKILL);
+	Write(RATIOX+2,  RATIOY+2,  STR_RATSECRET);
+	Write(RATIOX+2,  RATIOY+4,STR_RATTREASURE);
 	#else
 	Write(RATIOX+8,RATIOY,      STR_RATKILL);
 	Write(RATIOX+4,RATIOY+2,  STR_RATSECRET);
@@ -242,7 +246,7 @@ void Victory (void)
 	Write(x,RATIOY+4,tempstr);
 
 
-#ifndef SPANISH
+#if !defined(SPANISH) && !defined(CZECH)
 #ifndef UPLOAD
 #ifndef SPEAR
 	//
@@ -585,6 +589,8 @@ void LevelCompleted (void)
 #ifndef JAPAN
 	 #ifdef SPANISH
 	 Write(14,2,"piso\ncompletado");
+	 #elif defined(CZECH)
+	 Write(14,2,"patro\ndokonceno");
 	 #else
 	 Write(14,2,"floor\ncompleted");
 	 #endif
@@ -594,6 +600,10 @@ void LevelCompleted (void)
 	 Write(16,12,STR_PAR);
 
 	 #ifdef SPANISH
+	 Write(11,14,    STR_RAT2KILL);
+	 Write(11,16,  STR_RAT2SECRET);
+	 Write(11,18,STR_RAT2TREASURE);
+	 #elif defined(CZECH)
 	 Write(11,14,    STR_RAT2KILL);
 	 Write(11,16,  STR_RAT2SECRET);
 	 Write(11,18,STR_RAT2TREASURE);
@@ -607,6 +617,8 @@ void LevelCompleted (void)
 #endif
 
 	 #ifdef SPANISH
+	 Write(30,12,parTimes[gamestate.episode*10+mapon].timestr);
+	 #elif defined(CZECH)
 	 Write(30,12,parTimes[gamestate.episode*10+mapon].timestr);
 	 #else
 	 Write(26,12,parTimes[gamestate.episode*10+mapon].timestr);
@@ -627,6 +639,8 @@ void LevelCompleted (void)
 	 sec%=60;
 
 	 #ifdef SPANISH
+	 i=30*8;
+	 #elif defined(CZECH)
 	 i=30*8;
 	 #else
 	 i=26*8;
@@ -685,6 +699,8 @@ void LevelCompleted (void)
 
 
 	 #ifdef SPANISH
+	 #define RATIOXX		33
+	 #elif defined(CZECH)
 	 #define RATIOXX		33
 	 #else
 	 #define RATIOXX		37
@@ -1285,6 +1301,8 @@ void NonShareware(void)
 
 	#ifdef SPANISH
 	US_Print("Atencion");
+	#elif defined(CZECH)
+	US_Print("Pozor");
 	#else
 	US_Print("Attention");
 	#endif
@@ -1296,6 +1314,10 @@ void NonShareware(void)
 	US_Print("Este juego NO es gratis y\n");
 	US_Print("NO es Shareware; favor de\n");
 	US_Print("no distribuirlo.\n\n");
+	#elif defined(CZECH)
+	US_Print("Tato hra NENI shareware.\n");
+	US_Print("Prosime, nesdilej ji.\n");
+	US_Print("Dekujeme.\n\n");
 	#else
 	US_Print("This game is NOT shareware.\n");
 	US_Print("Please do not distribute it.\n");

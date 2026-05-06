@@ -485,6 +485,13 @@ void PageLayout (boolean shownumber)
 		strcat (str," de ");
 		py = 183;
 		px = 208;
+		#elif defined(CZECH)
+		strcpy (str,"str. ");
+		itoa (pagenum,str2,10);
+		strcat (str,str2);
+		strcat (str," z ");
+		py = 183;
+		px = 213;
 		#else
 		strcpy (str,"pg ");
 		itoa (pagenum,str2,10);
@@ -732,8 +739,13 @@ int 	endextern = T_ENDART1;
 int		helpextern = T_HELPART;
 #endif
 #endif
+#ifdef CZECH
+char helpfilename[13] = "HELPART.CZ",
+	 endfilename[13] = "ENDART1.CZ";
+#else
 char helpfilename[13] = "HELPART.",
 	 endfilename[13] = "ENDART1.";
+#endif
 #endif
 
 /*
