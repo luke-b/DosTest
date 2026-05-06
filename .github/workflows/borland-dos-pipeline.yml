@@ -225,7 +225,6 @@ jobs:
 
       - name: Update demo link in README.md
         run: |
-          SHORT_SHA="${{ steps.sha.outputs.short }}"
           DEMO_URL="https://luke-b.github.io/DosTest/demo/build/latest/"
           BADGE_LINE="[![Play latest build](https://img.shields.io/badge/Play-Latest%20Build-brightgreen)](${DEMO_URL})"
           BLOCK="<!-- DEMO_LINK -->\n${BADGE_LINE}\n<!-- /DEMO_LINK -->"
