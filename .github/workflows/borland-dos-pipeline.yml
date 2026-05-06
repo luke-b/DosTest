@@ -9,11 +9,12 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        env:
+          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
       - name: Install dosbox-x and xvfb
         run: |
-          sudo add-apt-repository -y ppa:dosbox-x/dosbox-x
-          sudo apt-get update
-          sudo apt-get install -y dosbox-x xvfb
+          sudo apt-get install -y xvfb
+          sudo snap install dosbox-x
       - name: Run DosBox to build Wolf3D
         run: |
           export TERM=dumb
@@ -28,13 +29,14 @@ jobs:
         with:
           name: dosbox-console-log
           path: dosbox_console_log.txt
+          if-no-files-found: ignore
           
   generate-html:
     runs-on: ubuntu-latest
     needs: build
     steps:
       - name: Download build artifact
-        uses: actions/download-artifact@v4.1.3
+        uses: actions/download-artifact@v4
         with:
           name: build-dos
 
