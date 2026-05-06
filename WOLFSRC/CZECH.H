@@ -10,7 +10,7 @@
 				  "Prepsat?"
 
 #define  ENDGAMESTR	"Opravdu chcete ukoncit\n"\
-					"probiha jici hru?\n"\
+					"probihajici hru?\n"\
 					"           (A nebo N):"
 
 #define   STR_NG	"Nova hra"
@@ -105,7 +105,7 @@
 #define   STR_NOSPACE2	"mista pro ulozeni hry!"
 
 #define   STR_SAVECHT1	"Tvuj soubor ulozene hry"
-#define   STR_SAVECHT2	"je, reknu ti to rovne, \"poskozeny\"."
+#define   STR_SAVECHT2	"je, reknu ti to rovnou, \"poskozeny\"."
 #define   STR_SAVECHT3	"Ale nechavam te hrat"
 #define   STR_SAVECHT4	"i tak...."
 
