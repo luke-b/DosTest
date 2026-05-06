@@ -8,23 +8,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
-      - name: Install dosbox
+        uses: actions/checkout@v4
+      - name: Install dosbox-x and xvfb
         run: |
-          sudo apt-get install snapd
-          sudo snap install dosbox-x
+          sudo add-apt-repository -y ppa:dosbox-x/dosbox-x
+          sudo apt-get update
+          sudo apt-get install -y dosbox-x xvfb
       - name: Run DosBox to build Wolf3D
-        run: >
+        run: |
           export TERM=dumb
-
-          dosbox-x -silent -debug -conf dosbox.conf -c "mount c . && c: && call autoexec.bat" -log-con 
+          xvfb-run --auto-servernum dosbox-x -silent -debug -conf dosbox.conf -c "mount c . && c: && call autoexec.bat" -log-con -exit
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build-dos
           path: WOLF3D
       - name: Upload console log
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: dosbox-console-log
           path: dosbox_console_log.txt
@@ -34,7 +34,7 @@ jobs:
     needs: build
     steps:
       - name: Download build artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: build-dos
 
@@ -76,7 +76,7 @@ jobs:
           echo '</html>' >> wolf3d.html
 
       - name: Upload HTML file
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: wolf3d-html
           path: wolf3d.html
