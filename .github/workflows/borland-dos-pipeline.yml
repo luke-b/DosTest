@@ -235,25 +235,32 @@ jobs:
 
           build_root="demo/build"
           mkdir -p "${build_root}"
+          retain_count="${RETAINED_GH_PAGES_BUILDS}"
+
+          case "${retain_count}" in
+            ''|*[!0-9]*|0)
+              echo "RETAINED_GH_PAGES_BUILDS must be a positive integer." >&2
+              exit 1
+              ;;
+          esac
 
           mapfile -t sha_build_dirs < <(
             find "${build_root}" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' \
               | grep -v '^latest$' \
               | while read -r dir; do
-                  ts="$(git log -1 --format=%ct -- "${build_root}/${dir}" 2>/dev/null || true)"
-                  [ -n "${ts}" ] || continue
+                  ts="$(git log -1 --format=%ct -- "${build_root}/${dir}" 2>/dev/null || git show -s --format=%ct HEAD)"
                   printf '%s %s\n' "${ts}" "${dir}"
                 done \
               | sort -rn \
               | awk '{print $2}'
           )
 
-          if [ "${#sha_build_dirs[@]}" -le "${RETAINED_GH_PAGES_BUILDS}" ]; then
+          if [ "${#sha_build_dirs[@]}" -le "${retain_count}" ]; then
             echo "No old builds to prune."
             exit 0
           fi
 
-          for dir in "${sha_build_dirs[@]:${RETAINED_GH_PAGES_BUILDS}}"; do
+          for dir in "${sha_build_dirs[@]:${retain_count}}"; do
             echo "Removing old build ${dir}"
             rm -rf "${build_root}/${dir}"
           done
