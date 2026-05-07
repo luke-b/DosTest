@@ -217,16 +217,20 @@ jobs:
           do
             echo "Checking ${url}"
             curl --fail --silent --show-error --location \
-              --retry 6 --retry-delay 30 --retry-all-errors \
+              --retry 6 --retry-delay 15 --retry-all-errors \
               "${url}" > /dev/null
           done
 
+      - name: Checkout gh-pages for pruning
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: gh-pages-prune
+          token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Prune old gh-pages builds
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
-          git clone --depth=1 --branch gh-pages "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" gh-pages-prune
           cd gh-pages-prune
 
           build_root="demo/build"
@@ -236,7 +240,7 @@ jobs:
             find "${build_root}" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' \
               | grep -v '^latest$' \
               | while read -r dir; do
-                  ts="$(git log -1 --format=%ct -- "${build_root}/${dir}" 2>/dev/null || echo 0)"
+                  ts="$(git log -1 --format=%ct -- "${build_root}/${dir}" 2>/dev/null || date +%s)"
                   printf '%s %s\n' "${ts}" "${dir}"
                 done \
               | sort -rn \
