@@ -245,10 +245,14 @@ jobs:
           esac
 
           mapfile -t sha_build_dirs < <(
-            find "${build_root}" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' \
-              | grep -v '^latest$' \
-              | while read -r dir; do
-                  ts="$(git log -1 --format=%ct -- "${build_root}/${dir}" 2>/dev/null || git show -s --format=%ct HEAD)"
+            find "${build_root}" -mindepth 1 -maxdepth 1 -type d \
+              | while read -r dir_path; do
+                  dir="$(basename "${dir_path}")"
+                  [ "${dir}" = "latest" ] && continue
+                  if ! ts="$(git log -1 --format=%ct -- "${build_root}/${dir}" 2>/dev/null)"; then
+                    echo "Failed to determine timestamp for ${build_root}/${dir}" >&2
+                    exit 1
+                  fi
                   printf '%s %s\n' "${ts}" "${dir}"
                 done \
               | sort -rn \
