@@ -1,27 +1,36 @@
-<div id="dosbox" style="width: 640px; height: 400px;">
-   <div class="dosbox-container">
-      <canvas class="dosbox-canvas" oncontextmenu="event.preventDefault()"></canvas>
-      <div class="dosbox-loader">
-         <div class="st-loader"><span class="equal"></span></div>
-         <div class="dosbox-loader-message"></div>
-      </div>
-      <div class="dosbox-overlay">
-         <div class="dosbox-powered">Powered by &nbsp;<a href="http://js-dos.com">js-dos.com</a></div>
-         <div class="dosbox-start">Click to start</div>
-      </div>
-   </div>
-</div>
-<br>
-<button onclick="dosbox.requestFullScreen();">Make fullscreen</button>
-<script type="text/javascript" src="https://js-dos.com/v8/build/wdosbox.js"></script>
-<script type="text/javascript">
-   var dosbox = new Dosbox({
-        id: "dosbox",
-        onload: function (dosbox) {
-        dosbox.run("https://github.com/luke-b/DosTest/actions/runs/9683912806/artifacts/1641429331", "./WOLF3D.EXE");
-        },
-        onrun: function (dosbox, app) {
-        console.log("App '" + app + "' is runned");
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wolfenstein 3D Legacy Demo Redirect</title>
+    <meta http-equiv="refresh" content="0; url=./demo/build/latest/">
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            padding: 24px;
+            background: #111;
+            color: #f5f5f5;
+            font-family: Arial, sans-serif;
+            text-align: center;
         }
-        });
-</script>
+
+        a {
+            color: #8fd3ff;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <h1>This legacy demo page has moved.</h1>
+        <p>Redirecting to the canonical hosted build at <a href="./demo/build/latest/">demo/build/latest</a>.</p>
+    </main>
+    <script>
+        window.location.replace(new URL('./demo/build/latest/', window.location.href).href);
+    </script>
+</body>
+</html>

@@ -3,65 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Play Wolfenstein 3D</title>
-    <link rel="stylesheet" href="https://js-dos.com/v8/js-dos.css">
-    <script src="https://js-dos.com/v8/js-dos.js"></script>
+    <title>Wolfenstein 3D Legacy Demo Redirect</title>
+    <meta http-equiv="refresh" content="0; url=./demo/build/latest/">
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            padding: 24px;
+            background: #111;
+            color: #f5f5f5;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        a {
+            color: #8fd3ff;
+        }
+    </style>
 </head>
 <body>
-    <h1>Wolfenstein 3D</h1>
-    <div id="Dos" style="width: 800px; height: 600px;"></div>
+    <main>
+        <h1>This legacy demo page has moved.</h1>
+        <p>Redirecting to the canonical hosted build at <a href="./demo/build/latest/">demo/build/latest</a>.</p>
+    </main>
     <script>
-        async function fetchLatestArtifactUrl() {
-            const owner = "luke-b";
-            const repo = "DosTest";
-            const workflow_id = "borland-dos-pipeline.yml";
-            const artifactName = "build-dos";
-
-            // Fetch the latest successful workflow run
-            let response = await fetch(`https://api.github.com/repos/${owner}/${repo}/actions/workflows/${workflow_id}/runs?status=success&per_page=1`);
-            let data = await response.json();
-            if (data.total_count === 0) {
-                throw new Error("No successful workflow runs found.");
-            }
-
-            const latestRun = data.workflow_runs[0];
-
-            // Fetch the artifacts for the latest successful run
-            response = await fetch(latestRun.artifacts_url);
-            data = await response.json();
-
-            const artifact = data.artifacts.find(a => a.name === artifactName);
-            if (!artifact) {
-                throw new Error(`Artifact ${artifactName} not found.`);
-            }
-
-            // Return the download URL for the artifact
-            return artifact.archive_download_url;
-        }
-
-        async function initDosBox() {
-            try {
-                //const artifactUrl = await fetchLatestArtifactUrl();
-                const artifactUrl = "https://github.com/luke-b/DosTest/actions/runs/9683912806/artifacts/1641429331";
-                Dos(document.getElementById("Dos"), {
-                    wdosboxUrl: 'https://js-dos.com/v8/build/wdosbox.js',
-                    cycles: 10000,
-                    autolock: true,
-                    zip: artifactUrl,
-                    onprogress: (stage, total, loaded) => {
-                        if (stage === 'unzipping') {
-                            console.log(`Unzipping: ${(loaded / total * 100).toFixed(2)}%`);
-                        }
-                    }
-                }).then(dosbox => {
-                    dosbox.run('wolf3d.exe');
-                });
-            } catch (error) {
-                console.error('Error initializing DOSBox:', error);
-            }
-        }
-
-        initDosBox();
+        window.location.replace(new URL('./demo/build/latest/', window.location.href).href);
     </script>
 </body>
 </html>
