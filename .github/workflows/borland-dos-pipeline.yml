@@ -11,6 +11,7 @@ permissions:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  RETAINED_GH_PAGES_BUILDS: 3
 
 jobs:
   build:
@@ -191,22 +192,92 @@ jobs:
           </html>
           EOF
 
-      - name: Deploy build to gh-pages
+      - name: Stage demo deployment
+        run: |
+          SHORT_SHA="${{ steps.sha.outputs.short }}"
+          mkdir -p "staging/demo/build/${SHORT_SHA}" "staging/demo/build/latest"
+          cp index.html "staging/demo/build/${SHORT_SHA}/index.html"
+          cp hra.jsdos "staging/demo/build/${SHORT_SHA}/hra.jsdos"
+          cp latest-redirect/index.html "staging/demo/build/latest/index.html"
+
+      - name: Deploy demo to gh-pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./
-          destination_dir: demo/build/${{ steps.sha.outputs.short }}
-          exclude_assets: "WOLF3D,latest-redirect"
+          publish_dir: ./staging/demo/build
+          destination_dir: demo/build
           keep_files: true
 
-      - name: Deploy latest redirect to gh-pages
-        uses: peaceiris/actions-gh-pages@v4
+      - name: Smoke test deployed demo
+        run: |
+          SHORT_SHA="${{ steps.sha.outputs.short }}"
+          for url in \
+            "https://luke-b.github.io/DosTest/demo/build/${SHORT_SHA}/" \
+            "https://luke-b.github.io/DosTest/demo/build/latest/"
+          do
+            echo "Checking ${url}"
+            curl --fail --silent --show-error --location \
+              --retry 3 --retry-delay 5 --retry-all-errors \
+              "${url}" > /dev/null
+          done
+
+      - name: Checkout gh-pages for pruning
+        uses: actions/checkout@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./latest-redirect
-          destination_dir: demo/build/latest
-          keep_files: true
+          ref: gh-pages
+          path: gh-pages-prune
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Prune old gh-pages builds
+        run: |
+          set -euo pipefail
+          cd gh-pages-prune
+
+          build_root="demo/build"
+          mkdir -p "${build_root}"
+          retain_count="${RETAINED_GH_PAGES_BUILDS}"
+
+          case "${retain_count}" in
+            ''|*[!0-9]*|0)
+              echo "RETAINED_GH_PAGES_BUILDS must be set to a positive integer." >&2
+              exit 1
+              ;;
+          esac
+
+          build_timestamps_file="$(mktemp)"
+          while read -r dir_path; do
+            dir="$(basename "${dir_path}")"
+            [ "${dir}" = "latest" ] && continue
+            if [ ! -d "${build_root}/${dir}" ]; then
+              echo "Build directory ${build_root}/${dir} does not exist." >&2
+              exit 1
+            fi
+            if ! ts="$(git log -1 --format=%ct -- "${build_root}/${dir}" 2>&1)"; then
+              echo "Failed to determine timestamp for ${build_root}/${dir}: ${ts}" >&2
+              exit 1
+            fi
+            printf '%s %s\n' "${ts}" "${dir}" >> "${build_timestamps_file}"
+          done < <(find "${build_root}" -mindepth 1 -maxdepth 1 -type d)
+
+          mapfile -t sha_build_dirs < <(sort -rn "${build_timestamps_file}" | awk '{print $2}' | grep -v '^$')
+
+          if [ "${#sha_build_dirs[@]}" -le "${retain_count}" ]; then
+            echo "No old builds to prune."
+            exit 0
+          fi
+
+          for dir in "${sha_build_dirs[@]:${retain_count}}"; do
+            echo "Removing old build ${dir}"
+            rm -rf "${build_root}/${dir}"
+          done
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add --all "${build_root}"
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: prune old demo builds [skip ci]"
+            git push
+          fi
 
   update-readme:
     runs-on: ubuntu-latest
