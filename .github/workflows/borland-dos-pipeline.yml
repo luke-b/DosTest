@@ -177,7 +177,7 @@ jobs:
                   async function startDemo() {
                       if (typeof Dos !== "function") {
                           console.error("js-dos failed to load before initialization.");
-                          updateStatus("The emulator runtime failed to load. Refresh the page and try again.", true);
+                          updateStatus("The js-dos runtime could not be loaded. Check your connection and try again.", true);
                           return;
                       }
 
@@ -237,10 +237,10 @@ jobs:
           cp index.html "staging/demo/build/${SHORT_SHA}/index.html"
           cp hra.jsdos "staging/demo/build/${SHORT_SHA}/hra.jsdos"
           cp latest-redirect/index.html "staging/demo/build/latest/index.html"
-          cp /home/runner/work/DosTest/DosTest/index.html staging/index.html
-          cp /home/runner/work/DosTest/DosTest/js-dos-test.html staging/js-dos-test.html
-          cp /home/runner/work/DosTest/DosTest/jsdos-demo1.html staging/jsdos-demo1.html
-          cp /home/runner/work/DosTest/DosTest/favicon.svg staging/favicon.svg
+          cp ./index.html staging/index.html
+          cp ./js-dos-test.html staging/js-dos-test.html
+          cp ./jsdos-demo1.html staging/jsdos-demo1.html
+          cp ./favicon.svg staging/favicon.svg
           touch staging/.nojekyll
 
       - name: Deploy demo to gh-pages
