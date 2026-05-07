@@ -259,7 +259,7 @@ jobs:
             printf '%s %s\n' "${ts}" "${dir}" >> "${build_timestamps_file}"
           done < <(find "${build_root}" -mindepth 1 -maxdepth 1 -type d)
 
-          mapfile -t sha_build_dirs < <(sort -rn "${build_timestamps_file}" | awk '{print $2}')
+          mapfile -t sha_build_dirs < <(sort -rn "${build_timestamps_file}" | awk '{print $2}' | grep -v '^$')
 
           if [ "${#sha_build_dirs[@]}" -le "${retain_count}" ]; then
             echo "No old builds to prune."
@@ -274,8 +274,10 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add --all "${build_root}"
-          git diff --cached --quiet || git commit -m "chore: prune old demo builds [skip ci]"
-          git push
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: prune old demo builds [skip ci]"
+            git push
+          fi
 
   update-readme:
     runs-on: ubuntu-latest
