@@ -11,6 +11,7 @@ permissions:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  RETAINED_GH_PAGES_BUILDS: 3
 
 jobs:
   build:
@@ -191,22 +192,72 @@ jobs:
           </html>
           EOF
 
-      - name: Deploy build to gh-pages
+      - name: Stage demo deployment
+        run: |
+          SHORT_SHA="${{ steps.sha.outputs.short }}"
+          mkdir -p "staging/demo/build/${SHORT_SHA}" "staging/demo/build/latest"
+          cp index.html "staging/demo/build/${SHORT_SHA}/index.html"
+          cp hra.jsdos "staging/demo/build/${SHORT_SHA}/hra.jsdos"
+          cp latest-redirect/index.html "staging/demo/build/latest/index.html"
+
+      - name: Deploy demo to gh-pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./
-          destination_dir: demo/build/${{ steps.sha.outputs.short }}
-          exclude_assets: "WOLF3D,latest-redirect"
+          publish_dir: ./staging/demo/build
+          destination_dir: demo/build
           keep_files: true
 
-      - name: Deploy latest redirect to gh-pages
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./latest-redirect
-          destination_dir: demo/build/latest
-          keep_files: true
+      - name: Smoke test deployed demo
+        run: |
+          SHORT_SHA="${{ steps.sha.outputs.short }}"
+          for url in \
+            "https://luke-b.github.io/DosTest/demo/build/${SHORT_SHA}/" \
+            "https://luke-b.github.io/DosTest/demo/build/latest/"
+          do
+            echo "Checking ${url}"
+            curl --fail --silent --show-error --location \
+              --retry 6 --retry-delay 30 --retry-all-errors \
+              "${url}" > /dev/null
+          done
+
+      - name: Prune old gh-pages builds
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          git clone --depth=1 --branch gh-pages "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" gh-pages-prune
+          cd gh-pages-prune
+
+          build_root="demo/build"
+          mkdir -p "${build_root}"
+
+          mapfile -t build_dirs < <(
+            find "${build_root}" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' \
+              | grep -v '^latest$' \
+              | while read -r dir; do
+                  ts="$(git log -1 --format=%ct -- "${build_root}/${dir}" 2>/dev/null || echo 0)"
+                  printf '%s %s\n' "${ts}" "${dir}"
+                done \
+              | sort -rn \
+              | awk '{print $2}'
+          )
+
+          if [ "${#build_dirs[@]}" -le "${RETAINED_GH_PAGES_BUILDS}" ]; then
+            echo "No old builds to prune."
+            exit 0
+          fi
+
+          for dir in "${build_dirs[@]:${RETAINED_GH_PAGES_BUILDS}}"; do
+            echo "Removing old build ${dir}"
+            rm -rf "${build_root}/${dir}"
+          done
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add "${build_root}"
+          git diff --cached --quiet || git commit -m "chore: prune old demo builds [skip ci]"
+          git push
 
   update-readme:
     runs-on: ubuntu-latest
