@@ -3,32 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Play Wolfenstein 3D</title>
-    <script src="https://js-dos.com/6.22/js-dos.js"></script>
+    <title>Wolfenstein 3D</title>
+    <meta http-equiv="refresh" content="0; url=./demo/build/latest/">
+    <link rel="canonical" href="https://luke-b.github.io/DosTest/">
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg">
     <style>
-        body {
+        :root {
+            color-scheme: dark;
             font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #000;
         }
-        #dosbox {
-            width: 80%;
-            height: 80%;
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            padding: 24px;
+            background: radial-gradient(circle at top, #25314f 0%, #111 48%, #050505 100%);
+            color: #f5f5f5;
+        }
+
+        main {
+            width: min(100%, 42rem);
+            padding: 28px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 14px;
+            background: rgba(0, 0, 0, 0.72);
+            box-shadow: 0 18px 48px rgba(0, 0, 0, 0.35);
+            text-align: center;
+        }
+
+        h1 {
+            margin: 0 0 12px;
+            font-size: clamp(1.8rem, 4vw, 2.6rem);
+        }
+
+        p {
+            margin: 0 0 16px;
+            line-height: 1.5;
+            color: #d0d0d0;
+        }
+
+        a {
+            color: #8fd3ff;
+        }
+
+        .button {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 12px 18px;
+            border-radius: 999px;
+            background: #2b84ff;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .button:hover {
+            background: #4d98ff;
         }
     </style>
 </head>
 <body>
-    <div id="dosbox"></div>
+    <main>
+        <h1>Wolfenstein 3D</h1>
+        <p>Redirecting to the latest browser build.</p>
+        <p>If you are not redirected automatically, open <a class="button" href="./demo/build/latest/">Play latest build</a>.</p>
+    </main>
     <script>
-        Dos(document.getElementById("dosbox")).ready(function (fs, main) {
-            fs.extract("https://github.com/luke-b/DosTest/wolf3d.zip").then(function () {
-                main(["-c", "wolf3d.exe"]);
-            });
-        });
+        window.location.replace(new URL('./demo/build/latest/', window.location.href).href);
     </script>
 </body>
 </html>

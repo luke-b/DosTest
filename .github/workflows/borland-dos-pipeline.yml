@@ -144,6 +144,7 @@ jobs:
               <meta charset="UTF-8">
               <meta name="viewport" content="width=device-width, initial-scale=1.0">
               <title>Wolfenstein 3D — build ${SHORT_SHA}</title>
+              <link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
               <link rel="stylesheet" href="https://js-dos.com/v8/js-dos.css">
               <script src="https://js-dos.com/v8/js-dos.js"></script>
               <style>
@@ -151,6 +152,8 @@ jobs:
                   body { background: #111; color: #eee; font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 20px; }
                   h1 { margin-bottom: 12px; font-size: 1.4rem; }
                   #dos { width: 800px; height: 600px; max-width: 100%; }
+                  #status { margin-top: 10px; min-height: 1.2em; font-size: 0.95rem; color: #b7c4d6; }
+                  #status.error { color: #ff9b9b; }
                   .meta { margin-top: 10px; font-size: 0.8rem; color: #888; }
                   button { margin-top: 10px; padding: 6px 16px; background: #333; color: #eee; border: 1px solid #555; cursor: pointer; border-radius: 4px; }
                   button:hover { background: #444; }
@@ -159,16 +162,51 @@ jobs:
           <body>
               <h1>Wolfenstein 3D</h1>
               <div id="dos"></div>
+              <p id="status" role="status" aria-live="polite">Loading emulator…</p>
               <button onclick="document.getElementById('dos').requestFullscreen && document.getElementById('dos').requestFullscreen()">Full screen</button>
               <p class="meta">build ${SHORT_SHA} &mdash; <a href="https://github.com/luke-b/DosTest/commit/${GITHUB_SHA}" style="color:#888">view commit</a></p>
               <script>
-                  Dos(document.getElementById("dos"), {
-                      url: "./hra.jsdos",
-                      onprogress: (stage, total, loaded) => {
-                          if (stage === "Resolving DosBox") return;
-                          console.log(stage, loaded, "/", total);
+                  const dosRoot = document.getElementById("dos");
+                  const status = document.getElementById("status");
+
+                  function updateStatus(message, isError = false) {
+                      status.textContent = message;
+                      status.classList.toggle("error", isError);
+                  }
+
+                  async function startDemo() {
+                      if (typeof Dos !== "function") {
+                          console.error("js-dos failed to load before initialization.");
+                          updateStatus("The emulator runtime failed to load. Refresh the page and try again.", true);
+                          return;
                       }
-                  });
+
+                      try {
+                          const dos = Dos(dosRoot, {
+                              url: "./hra.jsdos",
+                              onprogress: (stage, total, loaded) => {
+                                  if (stage === "Resolving DosBox") {
+                                      return;
+                                  }
+
+                                  const suffix = total ? ` (${loaded}/${total})` : "";
+                                  console.log(stage, loaded, "/", total);
+                                  updateStatus(`${stage}${suffix}`);
+                              }
+                          });
+
+                          if (dos && typeof dos.then === "function") {
+                              await dos;
+                          }
+
+                          updateStatus("Ready. Click inside the emulator window to start playing.");
+                      } catch (error) {
+                          console.error("Error initializing DOSBox:", error);
+                          updateStatus("The emulator failed to start. Check the browser console for details.", true);
+                      }
+                  }
+
+                  startDemo();
               </script>
           </body>
           </html>
@@ -199,19 +237,24 @@ jobs:
           cp index.html "staging/demo/build/${SHORT_SHA}/index.html"
           cp hra.jsdos "staging/demo/build/${SHORT_SHA}/hra.jsdos"
           cp latest-redirect/index.html "staging/demo/build/latest/index.html"
+          cp /home/runner/work/DosTest/DosTest/index.html staging/index.html
+          cp /home/runner/work/DosTest/DosTest/js-dos-test.html staging/js-dos-test.html
+          cp /home/runner/work/DosTest/DosTest/jsdos-demo1.html staging/jsdos-demo1.html
+          cp /home/runner/work/DosTest/DosTest/favicon.svg staging/favicon.svg
+          touch staging/.nojekyll
 
       - name: Deploy demo to gh-pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./staging/demo/build
-          destination_dir: demo/build
+          publish_dir: ./staging
           keep_files: true
 
       - name: Smoke test deployed demo
         run: |
           SHORT_SHA="${{ steps.sha.outputs.short }}"
           for url in \
+            "https://luke-b.github.io/DosTest/" \
             "https://luke-b.github.io/DosTest/demo/build/${SHORT_SHA}/" \
             "https://luke-b.github.io/DosTest/demo/build/latest/"
           do
@@ -296,7 +339,7 @@ jobs:
 
       - name: Update demo link in README.md
         run: |
-          DEMO_URL="https://luke-b.github.io/DosTest/demo/build/latest/"
+          DEMO_URL="https://luke-b.github.io/DosTest/"
           BADGE_LINE="[![Play latest build](https://img.shields.io/badge/Play-Latest%20Build-brightgreen)](${DEMO_URL})"
           BLOCK="<!-- DEMO_LINK -->\n${BADGE_LINE}\n<!-- /DEMO_LINK -->"
 
