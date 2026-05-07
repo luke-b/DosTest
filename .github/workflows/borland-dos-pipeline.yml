@@ -239,7 +239,7 @@ jobs:
 
           case "${retain_count}" in
             ''|*[!0-9]*|0)
-              echo "RETAINED_GH_PAGES_BUILDS must be a positive integer." >&2
+              echo "RETAINED_GH_PAGES_BUILDS must be set to a positive integer." >&2
               exit 1
               ;;
           esac
@@ -248,8 +248,12 @@ jobs:
           while read -r dir_path; do
             dir="$(basename "${dir_path}")"
             [ "${dir}" = "latest" ] && continue
-            if ! ts="$(git log -1 --format=%ct -- "${build_root}/${dir}" 2>/dev/null)"; then
-              echo "Failed to determine timestamp for ${build_root}/${dir}" >&2
+            if [ ! -d "${build_root}/${dir}" ]; then
+              echo "Build directory ${build_root}/${dir} does not exist." >&2
+              exit 1
+            fi
+            if ! ts="$(git log -1 --format=%ct -- "${build_root}/${dir}" 2>&1)"; then
+              echo "Failed to determine timestamp for ${build_root}/${dir}: ${ts}" >&2
               exit 1
             fi
             printf '%s %s\n' "${ts}" "${dir}" >> "${build_timestamps_file}"
