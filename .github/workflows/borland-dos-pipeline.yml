@@ -217,7 +217,7 @@ jobs:
           do
             echo "Checking ${url}"
             curl --fail --silent --show-error --location \
-              --retry 4 --retry-delay 5 --retry-all-errors \
+              --retry 3 --retry-delay 5 --retry-all-errors \
               "${url}" > /dev/null
           done
 
@@ -244,20 +244,18 @@ jobs:
               ;;
           esac
 
-          mapfile -t sha_build_dirs < <(
-            find "${build_root}" -mindepth 1 -maxdepth 1 -type d \
-              | while read -r dir_path; do
-                  dir="$(basename "${dir_path}")"
-                  [ "${dir}" = "latest" ] && continue
-                  if ! ts="$(git log -1 --format=%ct -- "${build_root}/${dir}" 2>/dev/null)"; then
-                    echo "Failed to determine timestamp for ${build_root}/${dir}" >&2
-                    exit 1
-                  fi
-                  printf '%s %s\n' "${ts}" "${dir}"
-                done \
-              | sort -rn \
-              | awk '{print $2}'
-          )
+          build_timestamps_file="$(mktemp)"
+          while read -r dir_path; do
+            dir="$(basename "${dir_path}")"
+            [ "${dir}" = "latest" ] && continue
+            if ! ts="$(git log -1 --format=%ct -- "${build_root}/${dir}" 2>/dev/null)"; then
+              echo "Failed to determine timestamp for ${build_root}/${dir}" >&2
+              exit 1
+            fi
+            printf '%s %s\n' "${ts}" "${dir}" >> "${build_timestamps_file}"
+          done < <(find "${build_root}" -mindepth 1 -maxdepth 1 -type d)
+
+          mapfile -t sha_build_dirs < <(sort -rn "${build_timestamps_file}" | awk '{print $2}')
 
           if [ "${#sha_build_dirs[@]}" -le "${retain_count}" ]; then
             echo "No old builds to prune."
